@@ -173,30 +173,22 @@ class QuandooRestaurantsWebScraper:
 if __name__ == '__main__':
 
     # Best Case Scenario 1 - Berlin - Multiple Page Results
-    # webscraper_berlin = QuandooRestaurantsWebScraper(city_name='berlin').obtain_scraped_data()
-    # webscraper_berlin.to_csv('scrapped_data/quandoo_berlin_restaurants.csv', index=False)
-    #
-    # # Best Case Scenario 2 - Frankfurt - Multiple Page Results
-    # webscraper_frankfurt = QuandooRestaurantsWebScraper(
-    #     city_name='FRANKFURT'
-    # ).obtain_scraped_data()
-    # webscraper_frankfurt.to_csv('scrapped_data/quandoo_frankfurt_restaurants.csv', index=False)
-    #
-    # # Edge case Scenario 3 - Rostock - Just 1 Page Result
-    # webscraper_rostock = QuandooRestaurantsWebScraper(
-    #     city_name='rostock'
-    # ).obtain_scraped_data()
-    # webscraper_rostock.to_csv('scrapped_data/quandoo_rostock_restaurants.csv', index=False)
-    #
-    # # Worst case Scenario 4 - Paris - No result available
-    # webscraper_paris = QuandooRestaurantsWebScraper(city_name='paris').obtain_scraped_data()
+    webscraper_berlin = QuandooRestaurantsWebScraper(city_name='berlin').obtain_scraped_data()
+    webscraper_berlin.to_csv('scrapped_data/quandoo_berlin_restaurants.csv', index=False)
+    
+    # Best Case Scenario 2 - Frankfurt - Multiple Page Results
+    webscraper_frankfurt = QuandooRestaurantsWebScraper(
+        city_name='FRANKFURT'
+    ).obtain_scraped_data()
+    webscraper_frankfurt.to_csv('scrapped_data/quandoo_frankfurt_restaurants.csv', index=False)
+    
+    # Edge case Scenario 3 - Rostock - Just 1 Page Result
+    webscraper_rostock = QuandooRestaurantsWebScraper(
+        city_name='rostock'
+    ).obtain_scraped_data()
+    webscraper_rostock.to_csv('scrapped_data/quandoo_rostock_restaurants.csv', index=False)
+    
+    # Worst case Scenario 4 - Paris - No result available
+    webscraper_paris = QuandooRestaurantsWebScraper(city_name='paris').obtain_scraped_data()
 
-    student_data = [
-        ['Alice Smith', '123 Main Street', 'Alice123@email.com', '2001-01-01', '10th grade'],
-        ['Bob Jones', '456 Elm Street', 'Bob456@email.com', '2002-02-02', '9th grade'],
-        ['Charlie Brown', '789 Oak Street', 'Charlie789@email.com', '2004-03-03', '8th grade'],
-    ]
-
-    # Create a DataFrame from the student data
-    df = pd.DataFrame(student_data, columns=['Name', 'Address', 'Email', 'Birthdate', 'Grade'])
-    df.to_csv('scraped_data/student_data.csv', index=False)
+     
