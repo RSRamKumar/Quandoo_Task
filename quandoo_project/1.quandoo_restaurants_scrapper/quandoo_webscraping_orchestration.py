@@ -1,4 +1,4 @@
-
+# DAG Script just a template and not executed with the main script
 
 import os
 from airflow import DAG
