@@ -5,7 +5,9 @@
 README file link: https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf
 
 DASHBOARD:
-![image](https://github.com/RSRamKumar/Quandoo_Task/assets/39699070/9ec22693-2006-4410-92c2-f8b88e2a3d76)
+
+![image](https://github.com/RSRamKumar/Quandoo_Task/assets/39699070/00bdfb0d-9670-4814-ac59-490e6ab75fe0)
+
 
 
 ![image](https://github.com/RSRamKumar/Quandoo_Task/assets/39699070/5b9cdee8-d16d-4849-b8ba-9437470ea30c)
