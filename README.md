@@ -2,7 +2,7 @@
 
 ** This is a temp directory and it will be removed later **
 
-README file link: https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf
+README file link: [README]([http://www.example.com](https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf)   https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf
 
 DASHBOARD:
 
