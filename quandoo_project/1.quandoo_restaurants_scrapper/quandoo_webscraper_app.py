@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import logging
 from typing import Union
+from enum import Enum
 
 
 # Create a logger
@@ -21,11 +22,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-class QuandooRestaurantsWebScraper:
-    """
-    Class to Webscrape the Restaurant Data of a given city from the Quandoo Webpage
-    """
-
+class SoupAttribute(Enum):
     # Initializing the constants used in parsing
     MERCHANT_CARD_WRAPPER = 'merchant-card-wrapper'
     MERCHANT_NAME = 'merchant-name'
@@ -34,6 +31,8 @@ class QuandooRestaurantsWebScraper:
     REVIEWS_SCORE = 'reviews-score'
     PAGINATION_BOX = 'pagination-box'
 
+
+class OutputVariable(Enum):
     # Variables Initialized for the results
     RESTAURANT_NAME = 'Restaurant_name'
     RESTAURANT_LOCATION = 'Restaurant_location'
@@ -41,6 +40,12 @@ class QuandooRestaurantsWebScraper:
     RESTAURANT_SCORE = 'Restaurant_score'
     NUMBER_OF_REVIEWS = 'Number_of_reviews'
     UNKNOWN_ATTRIBUTE = 'Unknown'
+
+
+class QuandooRestaurantsWebScraper:
+    """
+    Class to Webscrape the Restaurant Data of a given city from the Quandoo Webpage
+    """
 
     def __init__(self, city_name: str):
         self.city_name = city_name.lower()
@@ -66,7 +71,7 @@ class QuandooRestaurantsWebScraper:
         soup: soup object from the webpage url
         return: last page number (for example 'Berlin') or none (for example 'Rostock')
         """
-        pagination_info = soup.find('div', {'data-qa': self.PAGINATION_BOX})
+        pagination_info = soup.find('div', {'data-qa': SoupAttribute.PAGINATION_BOX.value})
         if pagination_info:
             *_, last_page_info = pagination_info.find_all('a')
             last_page_available = int(last_page_info.text)
@@ -83,7 +88,9 @@ class QuandooRestaurantsWebScraper:
         soup: soup object
         return: results in the form of dataframe of that specific webpage after parsing
         """
-        restaurant_results_raw = soup.find_all('div', {'data-qa': self.MERCHANT_CARD_WRAPPER})
+        restaurant_results_raw = soup.find_all(
+            'div', {'data-qa': SoupAttribute.MERCHANT_CARD_WRAPPER.value}
+        )
         restaurant_list = []
         for result in restaurant_results_raw:
 
@@ -91,30 +98,34 @@ class QuandooRestaurantsWebScraper:
 
             # Restaurant Name
             try:
-                restaurant_name = result.find('h3', {'data-qa': self.MERCHANT_NAME}).text
+                restaurant_name = result.find(
+                    'h3', {'data-qa': SoupAttribute.MERCHANT_NAME.value}
+                ).text
             except AttributeError:
-                restaurant_name = self.UNKNOWN_ATTRIBUTE
+                restaurant_name = OutputVariable.UNKNOWN_ATTRIBUTE.value
 
             # Restaurant Location
             try:
                 restaurant_location = result.find(
-                    'span', {'data-qa': self.MERCHANT_LOCATION}
+                    'span', {'data-qa': SoupAttribute.MERCHANT_LOCATION.value}
                 ).text
             except AttributeError:
-                restaurant_location = self.UNKNOWN_ATTRIBUTE
+                restaurant_location = OutputVariable.UNKNOWN_ATTRIBUTE.value
 
             # Restaurant Cuisine
             try:
                 restaurant_cuisine = result.find(
-                    'span', {'data-qa': self.MERCHANT_CARD_CUISINE}
+                    'span', {'data-qa': SoupAttribute.MERCHANT_CARD_CUISINE.value}
                 ).text
             except AttributeError:
-                restaurant_cuisine = self.UNKNOWN_ATTRIBUTE
+                restaurant_cuisine = OutputVariable.UNKNOWN_ATTRIBUTE.value
 
             # Restaurant Review score
             try:
                 restaurant_score = float(
-                    result.find('div', {'data-qa': self.REVIEWS_SCORE}).text.strip('/6')
+                    result.find(
+                        'div', {'data-qa': SoupAttribute.REVIEWS_SCORE.value}
+                    ).text.strip('/6')
                 )
             except AttributeError:
                 restaurant_score = None
@@ -128,11 +139,11 @@ class QuandooRestaurantsWebScraper:
                 number_of_reviews = int(number_of_review_tags[-1].text.strip('reviews'))
 
             parsed_restaurant_data = {
-                self.RESTAURANT_NAME: restaurant_name,
-                self.RESTAURANT_LOCATION: restaurant_location,
-                self.RESTAURANT_CUISINE: restaurant_cuisine,
-                self.RESTAURANT_SCORE: restaurant_score,
-                self.NUMBER_OF_REVIEWS: number_of_reviews,
+                OutputVariable.RESTAURANT_NAME.value: restaurant_name,
+                OutputVariable.RESTAURANT_LOCATION.value: restaurant_location,
+                OutputVariable.RESTAURANT_CUISINE.value: restaurant_cuisine,
+                OutputVariable.RESTAURANT_SCORE.value: restaurant_score,
+                OutputVariable.NUMBER_OF_REVIEWS.value: number_of_reviews,
             }
             restaurant_list.append(parsed_restaurant_data)
         return pd.DataFrame(restaurant_list)
@@ -171,22 +182,28 @@ class QuandooRestaurantsWebScraper:
 
 
 if __name__ == '__main__':
-
+    
     # Best Case Scenario 1 - Berlin - Multiple Page Results
     webscraper_berlin = QuandooRestaurantsWebScraper(city_name='berlin').obtain_scraped_data()
-    webscraper_berlin.to_csv('scraped_data_results/quandoo_berlin_restaurants.csv', index=False)
+    webscraper_berlin.to_csv(
+        'scraped_data_results/quandoo_berlin_restaurants.csv', index=False
+    )
     
     # Best Case Scenario 2 - Frankfurt - Multiple Page Results
     webscraper_frankfurt = QuandooRestaurantsWebScraper(
         city_name='FRANKFURT'
     ).obtain_scraped_data()
-    webscraper_frankfurt.to_csv('scraped_data_results/quandoo_frankfurt_restaurants.csv', index=False)
+    webscraper_frankfurt.to_csv(
+        'scraped_data_results/quandoo_frankfurt_restaurants.csv', index=False
+    )
     
     # Edge case Scenario 3 - Rostock - Just 1 Page Result
     webscraper_rostock = QuandooRestaurantsWebScraper(
         city_name='rostock'
     ).obtain_scraped_data()
-    webscraper_rostock.to_csv('scraped_data_results/quandoo_rostock_restaurants.csv', index=False)
+    webscraper_rostock.to_csv(
+        'scraped_data_results/quandoo_rostock_restaurants.csv', index=False
+    )
     
     # Worst case Scenario 4 - Paris - No result available
     webscraper_paris = QuandooRestaurantsWebScraper(city_name='paris').obtain_scraped_data()
