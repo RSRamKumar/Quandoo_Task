@@ -174,19 +174,19 @@ if __name__ == '__main__':
 
     # Best Case Scenario 1 - Berlin - Multiple Page Results
     webscraper_berlin = QuandooRestaurantsWebScraper(city_name='berlin').obtain_scraped_data()
-    webscraper_berlin.to_csv('scrapped_data/quandoo_berlin_restaurants.csv', index=False)
+    webscraper_berlin.to_csv('scraped_data_results/quandoo_berlin_restaurants.csv', index=False)
     
     # Best Case Scenario 2 - Frankfurt - Multiple Page Results
     webscraper_frankfurt = QuandooRestaurantsWebScraper(
         city_name='FRANKFURT'
     ).obtain_scraped_data()
-    webscraper_frankfurt.to_csv('scrapped_data/quandoo_frankfurt_restaurants.csv', index=False)
+    webscraper_frankfurt.to_csv('scraped_data_results/quandoo_frankfurt_restaurants.csv', index=False)
     
     # Edge case Scenario 3 - Rostock - Just 1 Page Result
     webscraper_rostock = QuandooRestaurantsWebScraper(
         city_name='rostock'
     ).obtain_scraped_data()
-    webscraper_rostock.to_csv('scrapped_data/quandoo_rostock_restaurants.csv', index=False)
+    webscraper_rostock.to_csv('scraped_data_results/quandoo_rostock_restaurants.csv', index=False)
     
     # Worst case Scenario 4 - Paris - No result available
     webscraper_paris = QuandooRestaurantsWebScraper(city_name='paris').obtain_scraped_data()
