@@ -6,5 +6,5 @@ COPY . /quandoo_webscraper_dir
 
 RUN pip install pandas requests beautifulsoup4
 
-CMD ["python", "./quandoo_webscraper_app.py"]
+CMD ["python", "quandoo_webscraper_app.py"]
 
