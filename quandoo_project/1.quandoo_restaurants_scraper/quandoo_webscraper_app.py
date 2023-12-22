@@ -5,7 +5,6 @@ import logging
 from typing import Union
 from enum import Enum
 
-
 # Create a logger
 logger = logging.getLogger(__name__)
 # Set the logging level
