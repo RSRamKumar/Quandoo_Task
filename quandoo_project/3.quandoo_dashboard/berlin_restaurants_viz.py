@@ -8,7 +8,7 @@ from dash import html
 
 app = dash.Dash(__name__)
 
-df = pd.read_csv('scraped_data/quandoo_berlin_results.csv')
+df = pd.read_csv('scraped_data/quandoo_berlin_restaurants.csv')
 
 # Scatter Plot for Comparing Restaurant Cuisine and its Average Reviews
 df_a = (
