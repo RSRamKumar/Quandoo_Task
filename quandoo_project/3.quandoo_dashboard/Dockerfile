@@ -6,4 +6,4 @@ COPY . /quandoo_viz
 
 RUN pip install pandas plotly dash
 
-CMD ["python", "./berlin_restaurants_viz.py"]
+CMD ["python", "berlin_restaurants_viz.py"]
