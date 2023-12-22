@@ -1,10 +1,8 @@
 FROM python:latest
 
-WORKDIR /quandoo_webscraper
+WORKDIR /quandoo_webscraper_dir
 
-VOLUME ["/quandoo_webscraper"]
-
-COPY . /quandoo_webscraper
+COPY . /quandoo_webscraper_dir
 
 RUN pip install pandas requests beautifulsoup4
 
