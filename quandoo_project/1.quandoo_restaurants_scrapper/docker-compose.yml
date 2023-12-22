@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  quandoo_restaurant_scraper:
+   build: .
+   volumes:
+     -  ./:/quandoo_webscraper_dir
+     - ./scraped_data_results:/scraped_data_results
+
