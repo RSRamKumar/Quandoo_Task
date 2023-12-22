@@ -7,11 +7,11 @@ services:
     environment:
       POSTGRES_USER : postgres
       POSTGRES_PASSWORD : postgres
-      POSTGRES_DB : scrapped_data_database
+      POSTGRES_DB : scraped_data_database
     ports:
       - 5432:5432
     volumes:
-      - pg-data-volume:/var/lib/postgresql/data
+      - postgres-data-volume:/var/lib/postgresql/data
 
   adminer:
     image: adminer
@@ -22,8 +22,9 @@ services:
       - 8080:8080
 
 volumes:
-  pg-data-volume:
-    driver: local
+  postgres-data-volume:
+    #driver: local
+
 
 
 
