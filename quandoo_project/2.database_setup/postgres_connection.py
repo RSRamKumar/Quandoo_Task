@@ -14,7 +14,7 @@ conn = psycopg2.connect(
 # Cursor to perform operations
 cursor = conn.cursor()
 
-engine = create_engine(f'postgresql://postgres:postgres@0.0.0.0/scrapped_data_database')
+engine = create_engine(f'postgresql://postgres:postgres@0.0.0.0/scraped_data_database')
 
 # Reading the result file
 df = pd.read_csv('quandoo_berlin_results.csv')
