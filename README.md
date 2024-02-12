@@ -1,8 +1,8 @@
-# Quandoo_Task
+# Webscraping Project
 
-** This is a temp directory and it will be removed later **
+A side project to do webscraping of the Restaurants in a given city from a public webpage.
 
-README file link: [README](https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf)   https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf
+README file link: [README](https://github.com/RSRamKumar/Quandoo_Task/blob/main/RamKumarRS_Task_Readme.pdf)    
 
 DASHBOARD:
 
