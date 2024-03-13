@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  berlin_quandoo_restaurants_dash_app:
+   build: .
+   ports:
+     - '9002:9000'
+
+
+
+
+
+
+
+
+
