@@ -1,0 +1,122 @@
+[
+    {
+        "restaurant_name": "Landhotel Rittmeister",
+        "restaurant_location": "Biestow area",
+        "restaurant_cuisine": "German Restaurant",
+        "restaurant_score": 5.7,
+        "number_of_reviews": 15,
+        "restaurant_url": "https://www.quandoo.de/en/place/landhotel-rittmeister-54324",
+        "restaurant_meta_data": {
+            "restaurant_tags": [
+                "Family-friendly ✨",
+                "Good for groups 🎉",
+                "Card payment",
+                "Parking options",
+                "Outdoor seating"
+            ],
+            "restaurant_address": "Biestower Damm 1,18059 Rostock",
+            "restaurant_menu": [
+                {
+                    "dish": "KLEINER HAUS-SALAT",
+                    "price": "7,50€"
+                },
+                {
+                    "dish": "FEINER HERINGS-KARTOFFEL-SALAT",
+                    "price": "8,50€"
+                },
+                {
+                    "dish": "SCHAFSKÄSE",
+                    "price": "9,00€"
+                },
+                {
+                    "dish": "BLATTSPINAT & CASHEWKERNE",
+                    "price": "18,00€"
+                },
+                {
+                    "dish": "KALBSSCHNITZEL",
+                    "price": "23,50€"
+                },
+                {
+                    "dish": "DORSCHFILET",
+                    "price": "21,50€"
+                },
+                {
+                    "dish": "ROTE GRÜTZE",
+                    "price": "6,50€"
+                },
+                {
+                    "dish": "GEBACKENE MARZIPANPFLAUMEN",
+                    "price": "8,50€"
+                }
+            ]
+        }
+    },
+    {
+        "restaurant_name": "Restaurant LUV & LEE",
+        "restaurant_location": "Seebad Warnemünde area",
+        "restaurant_cuisine": "German Restaurant",
+        "restaurant_score": 5.2,
+        "number_of_reviews": 123,
+        "restaurant_url": "https://www.quandoo.de/en/place/restaurant-luv-lee-91664",
+        "restaurant_meta_data": {
+            "restaurant_tags": [
+                "Family-friendly ✨",
+                "Good for groups 🎉",
+                "Card payment",
+                "Parking options",
+                "Outdoor seating"
+            ],
+            "restaurant_address": "Am Leuchtturm 3,18119 Rostock",
+            "restaurant_menu": [
+                {
+                    "dish": "Bouillabaisse Luv & Lee",
+                    "price": "6,90€"
+                },
+                {
+                    "dish": "Burrata – der Edelmozzarella mit flüssigem Kern",
+                    "price": "10,50€"
+                },
+                {
+                    "dish": "Rindertatar",
+                    "price": "12,50€"
+                },
+                {
+                    "dish": "Tagliatelle mit Blattspinat (vegetarisch)",
+                    "price": "13,90€"
+                },
+                {
+                    "dish": "König der Ostsee",
+                    "price": "16,90€"
+                },
+                {
+                    "dish": "Rinderfilet (250g)",
+                    "price": "23,50€"
+                },
+                {
+                    "dish": "Austern Natur - pur / Zitrone 3 Stk.",
+                    "price": "14,90€"
+                },
+                {
+                    "dish": "Austern Royal - gegrillt / Spinat / Parmesan 3 Stk.",
+                    "price": "18,90€"
+                },
+                {
+                    "dish": "Austern Deluxe - pur / Zitrone / Blattgold 3 Stk.",
+                    "price": "19,90€"
+                },
+                {
+                    "dish": "Mousse au Chocolat",
+                    "price": "5,90€"
+                },
+                {
+                    "dish": "Sturmsack",
+                    "price": "6,90€"
+                },
+                {
+                    "dish": "Créme Brulée",
+                    "price": "7,50€"
+                }
+            ]
+        }
+    }
+]
