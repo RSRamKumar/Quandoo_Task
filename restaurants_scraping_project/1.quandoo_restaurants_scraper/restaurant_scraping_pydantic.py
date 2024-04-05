@@ -5,8 +5,8 @@ import json
 import logging
 from enum import Enum
 import time
-from typing import Optional, Union, List
-#from typing_extensions import URL
+from typing import Dict, Optional, Union, List
+# from typing_extensions import URL
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -43,12 +43,23 @@ class SoupAttribute(Enum):
     MERCHANT_ADDRESS = "merchant-address"
 
 
+class RestaurantMenu(BaseModel):
+    """
+    Initalizing the Pydantic data model for the restaurant menu
+    """
+
+    dish: str
+    price: Optional[str]
+
+
 class RestaurantMetaData(BaseModel):
     """
     Initalizing the Pydantic data model for the restaurant scraped meta data
     """
+
     restaurant_tags: List[str]
     restaurant_address: str
+    restaurant_menu: List[RestaurantMenu]
 
     @field_validator("restaurant_address", mode="before")
     @classmethod
@@ -134,17 +145,16 @@ class QuandooRestaurantsWebScraper:
         response = requests.get(url, timeout=10)
         soup = BeautifulSoup(response.content, "html.parser")
         return soup
-    
+
     @staticmethod
-    def combine_json_strings(json_strings: List[str]) -> List[dict]:
-         """
-         Method for converting list containing json strings 
-         to a list containing json dict
-         """
-         data_list = list(map(json.loads, json_strings))
-         return data_list
-          
- 
+    def combine_json_strings(json_strings: List[str]) -> List[Dict]:
+        """
+        Method for converting list containing json strings
+        to a list containing json dict
+        """
+        data_list = list(map(json.loads, json_strings))
+        return data_list
+
     def find_last_page(self, soup: BeautifulSoup) -> Union[int, None]:
         """
         Method for determining the last page of the available results
@@ -156,19 +166,19 @@ class QuandooRestaurantsWebScraper:
         )
         if pagination_info:
             *_, last_page_info = pagination_info.find_all("a")
-            last_page_available = int(last_page_info.text)
+            last_page_number_available = int(last_page_info.text)
             logger.info(
                 "There are %s pages of results for the city %s",
-                last_page_available,
+                last_page_number_available,
                 self.city_name.title(),
             )
-            return last_page_available
+            return last_page_number_available
         logger.info("We have just one page for the %s.", self.city_name)
         return None
 
     def parse_individual_restaurant_data_from_scrape(
         self, raw_restaurant_html: Tag
-    ) -> dict:
+    ) -> Dict:
         """
         Method for extracting the required restaurant information from each restaurant's html tag
         raw_restaurant_html: beautifulsoup tag element containing the individual restaurant element
@@ -213,12 +223,13 @@ class QuandooRestaurantsWebScraper:
             f"{self.base_url}{raw_restaurant_html.find('a').get('href')}"
         )
         restaurant_data_dict["restaurant_url"] = self.restaurant_url
-        restaurant_data_dict["restaurant_meta_data"] = self.parse_restaurant_meta_data() 
+        restaurant_data_dict["restaurant_meta_data"] = self.parse_restaurant_meta_data()
         return restaurant_data_dict
 
-    def parse_restaurant_meta_data(self) -> dict:
+    def parse_restaurant_meta_data(self) -> Dict:
         """
         Method for extracting the restaurant meta data namely tags and address
+        and menu and returns in a dict
         """
         meta_data_response = self.extract_soup_from_webpage(self.restaurant_url)
         restaurant_tag_list = [
@@ -235,12 +246,30 @@ class QuandooRestaurantsWebScraper:
         ]
         return {
             "restaurant_address": restaurant_address,
-            "restaurant_tags": restaurant_tag_list
+            "restaurant_tags": restaurant_tag_list,
+            "restaurant_menu": self.parse_restaurant_menu(),
         }
 
-    def parse_all_restaurant_data_from_single_page(
-        self, soup: BeautifulSoup
-    ) -> List:
+    def parse_restaurant_menu(self) -> List:
+        """
+        Method for extracting the restaurant menu namely dish and price
+        and returns it in a list
+        """
+        menu_list = []
+        menu_data_response = self.extract_soup_from_webpage(
+            f"{self.restaurant_url}/menu"
+        )
+        # menu_section_list = menu_data_response.find_all("div",
+        # {"data-name": 'menu-section'})
+        raw_menu_list = menu_data_response.find_all("h5")
+        for raw_menu in raw_menu_list:
+            dish = raw_menu.text
+            price = raw_menu.find_next("div").text
+            menu_list.append({"dish": dish, "price": price})
+
+        return menu_list
+
+    def parse_all_restaurant_data_from_single_page(self, soup: BeautifulSoup) -> List:
         """
         Method for extracting the restaurant data for all the restaurants
         listed in a page
@@ -257,7 +286,7 @@ class QuandooRestaurantsWebScraper:
             ).model_dump_json()
             for raw_result in restaurant_raw_results_list
         ]
-        return restaurant_list 
+        return restaurant_list
 
     def obtain_scraped_result_for_city(self) -> None:
         """
@@ -272,10 +301,13 @@ class QuandooRestaurantsWebScraper:
                 "Unfortunately, There is no data for %s!", self.city_name.title()
             )
             return None
+        logger.info("The Scraping Process Started ...")
         first_page_result = self.parse_all_restaurant_data_from_single_page(
             first_page_soup
         )
-        logger.info("First page results are successfully parsed for %s", self.city_name.title())
+        logger.info(
+            "First page results are successfully parsed for %s", self.city_name.title()
+        )
         self.final_result_list.extend(self.combine_json_strings(first_page_result))
 
         determined_last_page = self.find_last_page(first_page_soup)
@@ -292,31 +324,36 @@ class QuandooRestaurantsWebScraper:
                 )
                 self.final_result_list.extend(self.combine_json_strings(result_list))
                 time.sleep(2)
-        
-        with open('combined_data_result.json', 'w', encoding='utf-8') as outfile:
-                json.dump(self.final_result_list, outfile, indent=4, ensure_ascii=False)
+
+        output_file_name = f"{self.city_name.title()}_restaurants.json"
+        with open(output_file_name, "w", encoding="utf-8") as outputfile:
+            json.dump(self.final_result_list, outputfile, indent=4, ensure_ascii=False)
 
         logger.info("All the pages are successfully parsed!")
-         
+        logger.info(
+            "The total number of restaurants parsed are %s", len(self.final_result_list)
+        )
 
 
 if __name__ == "__main__":
+    # Scraping for a desired city
+    QuandooRestaurantsWebScraper(city_name="rostock").obtain_scraped_result_for_city()
 
-    # Scraping for - Frankfurt - Multiple Page Results
-    # QuandooRestaurantsWebScraper(city_name="rome").obtain_scraped_result_for_city()
-
-    r = RestaurantData(
-        restaurant_name='Ram Restaurant', restaurant_location='Ram Nagar',
-    restaurant_score= '5.55/6',
-        restaurant_cuisine='Indian',   number_of_reviews='678',
-        restaurant_url= 'https://www.ramrestaurant.com/',
-        restaurant_meta_data = RestaurantMetaData(
-            restaurant_name='Ram Restaurant',
-            restaurant_tags= ['Family-friendly ✨', 'Good for groups 🎉'],
-            restaurant_address= ['Ramstraße 1', 'Ram Nagar'])
-    )
-    print(type(r.model_dump()))
-    print("*********************************")
-    print(type(r.model_dump_json()))
-
-    
+    # r = RestaurantData(
+    #     restaurant_name="Ram Restaurant",
+    #     restaurant_location="Ram Nagar",
+    #     restaurant_score="5.55/6",
+    #     restaurant_cuisine="Indian",
+    #     number_of_reviews="678",
+    #     restaurant_url="https://www.ramrestaurant.com/",
+    #     restaurant_meta_data=RestaurantMetaData(
+    #         restaurant_name="Ram Restaurant",
+    #         restaurant_tags=["Family-friendly ✨", "Good for groups 🎉"],
+    #         restaurant_address=["Ramstraße 1", "Ram Nagar"],
+    #         restaurant_menu=[
+    #             {"dish": "Dosa", "price": "12€"},
+    #             RestaurantMenu(dish="Chicken", price="25€"),
+    #         ],
+    #     ),
+    # )
+    # print((r.model_dump()))
