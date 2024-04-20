@@ -2,11 +2,13 @@
 creating Pydantic Models"""
 
 import asyncio
+from functools import partial
 import itertools
 import json
 import logging
 from enum import Enum
 from typing import Dict, List, Optional, Union
+
 
 # from typing_extensions import URL
 import requests
@@ -127,13 +129,15 @@ class QuandooRestaurantsWebScraper:
     Class to Webscrape the Restaurant Data of a given city from the Quandoo Webpage
     """
 
-    def __init__(self, city_name: str):
+    def __init__(self, city_name: str, result_limit: int = 10):
         self.city_name = city_name.lower()
+        self.result_limit = result_limit
         self.base_url = "https://www.quandoo.de"
         self.search_url = f"{self.base_url}/en/result?destination={self.city_name}"
         logger.info("The city chosen for webscraping is %s", self.city_name.title())
 
         self.restaurant_url = None
+        self.scraped_restaurants_count = 0
 
     @staticmethod
     def extract_soup_from_webpage(url) -> BeautifulSoup:
@@ -280,17 +284,37 @@ class QuandooRestaurantsWebScraper:
         soup: soup object
         return: results in the form of list of that specific webpage after parsing
         """
+
         restaurant_raw_results_list = soup.find_all(
             "div", {"data-qa": SoupAttribute.MERCHANT_CARD_WRAPPER.value}
         )
 
-        restaurant_list = [
-            RestaurantData(
-                **(await self.parse_individual_restaurant_data_from_scrape(raw_result))
-            ).model_dump_json()
-            for raw_result in restaurant_raw_results_list
-        ]
-        logger.info("The Scraping process done for a single page.")
+        # restaurant_list = [
+        #     RestaurantData(
+        #         **(await self.parse_individual_restaurant_data_from_scrape(raw_result))
+        #     ).model_dump_json()
+        #     for raw_result in restaurant_raw_results_list
+        # ]
+
+        restaurant_list = []
+        for raw_result in restaurant_raw_results_list:
+            if self.scraped_restaurants_count >= self.result_limit:
+                break
+            restaurant_list.append(
+                RestaurantData(
+                    **(
+                        await self.parse_individual_restaurant_data_from_scrape(
+                            raw_result
+                        )
+                    )
+                ).model_dump_json()
+            )
+            self.scraped_restaurants_count += 1
+            logger.info(
+                "Scraped the %s restaurant for %s",
+                self.scraped_restaurants_count,
+                self.city_name.title(),
+            )
         return restaurant_list
 
     async def obtain_scraped_result_for_city(self) -> None:
@@ -309,14 +333,18 @@ class QuandooRestaurantsWebScraper:
         logger.info("The Scraping Process Started ...")
         determined_last_page = self.find_last_page(first_page_soup)
         task_list = []
-        async with asyncio.TaskGroup() as tg:
-            for page in range(1, determined_last_page + 1):
-                logger.info(
-                    "Started parsing the page number: %s for %s ..........",
-                    page,
-                    self.city_name.title(),
-                )
-                nextpage_url = self.search_url + f"&page={page}"
+
+        for page in range(1, determined_last_page + 1):
+            if self.scraped_restaurants_count >= self.result_limit:
+                break
+            logger.info(
+                "Started parsing the page number: %s for %s ..........",
+                page,
+                self.city_name.title(),
+            )
+            nextpage_url = self.search_url + f"&page={page}"
+
+            async with asyncio.TaskGroup() as tg:
                 task_list.append(
                     tg.create_task(
                         self.parse_all_restaurant_data_from_single_page(
@@ -325,26 +353,37 @@ class QuandooRestaurantsWebScraper:
                     )
                 )
         results = [task.result() for task in task_list]
-        final_result_list = [self.combine_json_strings(result) for result in results]
+        final_result_list = list(
+            itertools.chain(
+                *([self.combine_json_strings(result) for result in results])
+            )
+        )
         # for result in results:
         #    print(result)
         output_file_name = f"{self.city_name}_restaurants.json"
         with open(output_file_name, "w", encoding="utf-8") as outputfile:
             json.dump(final_result_list, outputfile, indent=4, ensure_ascii=False)
 
-        logger.info("All the pages are successfully parsed!")
         logger.info(
             "The total number of restaurants parsed are %s",
-            len(list(itertools.chain(*final_result_list))),
+            len(final_result_list),
         )
-
 
 if __name__ == "__main__":
     # Scraping for a desired city
-    # QuandooRestaurantsWebScraper(city_name="frankfurt").obtain_scraped_result_for_city()
-    asyncio.run(
-        QuandooRestaurantsWebScraper(
+
+    scrape_restaurants_with_limit_15 = partial(
+        QuandooRestaurantsWebScraper, result_limit=27
+    )
+
+    frankfurt_scraper = asyncio.run(
+        scrape_restaurants_with_limit_15(
             city_name="frankfurt"
+        ) .obtain_scraped_result_for_city()
+    )
+    hannover_scraper = asyncio.run(
+        scrape_restaurants_with_limit_15(
+            city_name="hannover"
         ).obtain_scraped_result_for_city()
     )
 
