@@ -8,6 +8,7 @@ import json
 import logging
 from enum import Enum
 from typing import Dict, List, Optional, Union
+from inflect import engine
 
 
 # from typing_extensions import URL
@@ -138,6 +139,8 @@ class QuandooRestaurantsWebScraper:
 
         self.restaurant_url = None
         self.scraped_restaurants_count = 0
+        self.reached_result_limit = False
+        self.ordinal_number = engine()
 
     @staticmethod
     def extract_soup_from_webpage(url) -> BeautifulSoup:
@@ -299,6 +302,7 @@ class QuandooRestaurantsWebScraper:
         restaurant_list = []
         for raw_result in restaurant_raw_results_list:
             if self.scraped_restaurants_count >= self.result_limit:
+                self.reached_result_limit = True
                 break
             restaurant_list.append(
                 RestaurantData(
@@ -312,9 +316,10 @@ class QuandooRestaurantsWebScraper:
             self.scraped_restaurants_count += 1
             logger.info(
                 "Scraped the %s restaurant for %s",
-                self.scraped_restaurants_count,
+                 self.ordinal_number.ordinal(self.scraped_restaurants_count),
                 self.city_name.title(),
             )
+
         return restaurant_list
 
     async def obtain_scraped_result_for_city(self) -> None:
@@ -335,7 +340,7 @@ class QuandooRestaurantsWebScraper:
         task_list = []
 
         for page in range(1, determined_last_page + 1):
-            if self.scraped_restaurants_count >= self.result_limit:
+            if self.reached_result_limit:
                 break
             logger.info(
                 "Started parsing the page number: %s for %s ..........",
@@ -369,17 +374,18 @@ class QuandooRestaurantsWebScraper:
             len(final_result_list),
         )
 
+
 if __name__ == "__main__":
     # Scraping for a desired city
 
     scrape_restaurants_with_limit_15 = partial(
-        QuandooRestaurantsWebScraper, result_limit=27
+        QuandooRestaurantsWebScraper, result_limit=15
     )
 
     frankfurt_scraper = asyncio.run(
         scrape_restaurants_with_limit_15(
-            city_name="frankfurt"
-        ) .obtain_scraped_result_for_city()
+            city_name="muenchen"
+        ).obtain_scraped_result_for_city()
     )
     hannover_scraper = asyncio.run(
         scrape_restaurants_with_limit_15(
