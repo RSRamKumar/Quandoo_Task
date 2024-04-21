@@ -11,7 +11,6 @@ from typing import Dict, List, Optional, Union
 from inflect import engine
 
 
-# from typing_extensions import URL
 import requests
 from bs4 import BeautifulSoup, Tag
 from pydantic import AnyHttpUrl, BaseModel, Field, field_serializer, field_validator
@@ -143,7 +142,7 @@ class QuandooRestaurantsWebScraper:
         self.ordinal_number = engine()
 
     @staticmethod
-    def extract_soup_from_webpage(url) -> BeautifulSoup:
+    def extract_soup_from_webpage(url:str) -> BeautifulSoup:
         """
         Method for extracting the soup (webpage html content)
         url : webpage url
